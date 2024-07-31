@@ -1,14 +1,9 @@
-package br.com.alura.screnmatch.principal;
+package br.com.alura.screenmatch.principal;
 
-import br.com.alura.screnmatch.model.DadosEpisodio;
-import br.com.alura.screnmatch.model.DadosSerie;
-import br.com.alura.screnmatch.model.DadosTemporada;
-import br.com.alura.screnmatch.model.Episodio;
-import br.com.alura.screnmatch.service.ConsumoApi;
-import br.com.alura.screnmatch.service.ConverteDados;
+import br.com.alura.screenmatch.model.*;
+import br.com.alura.screenmatch.service.ConsumoApi;
+import br.com.alura.screenmatch.service.ConverteDados;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -23,16 +18,22 @@ public class Principal {
     private final String ENDERECO = "https://www.omdbapi.com/?t=";
     private final String API_KEY = "&apikey=ffb057bc";
 
+    private List<DadosSerie> dadosSeries = new ArrayList<>();
+
     public void exibeMenu() {
+        var opcao = -1;
+        while (opcao != 0){
+
         var menu = """
                 1 - Buscar séries
                 2 - Buscar episódios
+                3 - Listar séries buscadas
                 
-                0 - Sair                                 
+                0 - Sair
                 """;
 
         System.out.println(menu);
-        var opcao = leitura.nextInt();
+        opcao = leitura.nextInt();
         leitura.nextLine();
 
         switch (opcao) {
@@ -42,16 +43,21 @@ public class Principal {
             case 2:
                 buscarEpisodioPorSerie();
                 break;
+            case 3:
+                listarSeriesBuscadas();
+                break;
             case 0:
                 System.out.println("Saindo...");
                 break;
             default:
                 System.out.println("Opção inválida");
         }
+        }
     }
 
     private void buscarSerieWeb() {
         DadosSerie dados = getDadosSerie();
+        dadosSeries.add(dados);
         System.out.println(dados);
     }
 
@@ -73,5 +79,14 @@ public class Principal {
             temporadas.add(dadosTemporada);
         }
         temporadas.forEach(System.out::println);
+    }
+
+    private void listarSeriesBuscadas(){
+
+        List<Serie> series = new ArrayList<>();
+        dadosSeries.stream()
+                        .map(d -> new Serie(d))
+                                .collect(Collectors.toList());
+        series.stream().sorted(Comparator.comparing(Serie::getGenero)).forEach(System.out::println);
     }
 }
